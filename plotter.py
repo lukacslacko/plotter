@@ -15,13 +15,35 @@ def draw_lines(lines):
     scaled_lines = [[((p[0] - min_x) * scale + x_offset, (p[1] - min_y) * scale + y_offset) for p in line] for line in lines]
     bed_x_size = st.session_state.bed_x_size
     bed_y_size = st.session_state.bed_y_size
+    g_code_commands = []
+    # Set up G-code
+    # G28: Home all axes
+    g_code_commands.append(f"G28")
+    # G21: Set units to millimeters
+    g_code_commands.append(f"G21")
+    # G90: Set to absolute positioning
+    g_code_commands.append(f"G90")
+    # G92: Set current position to 0,0,0
+    g_code_commands.append(f"G92 X0 Y0 Z0")
+    # Move to starting position
+    g_code_commands.append(f"G1 Z{st.session_state.head_lift}")
     svg_string = f"""<svg width="{bed_x_size}" height="{bed_y_size}" xmlns="http://www.w3.org/2000/svg">"""
     # Draw box from (0,0) to (bed_x_size, bed_y_size)
     svg_string += f"""<polyline points="0,0 0,{bed_y_size} {bed_x_size},{bed_y_size} {bed_x_size},0 0,0" fill="none" stroke="black" stroke-width="1"/>"""
     for line in scaled_lines:
         svg_string += f"""<polyline points='{" ".join([f"{p[0]},{p[1]}" for p in line])}' fill="none" stroke="black" stroke-width="{st.session_state.stroke_width}"/>"""
+        # Move to starting position
+        g_code_commands.append(f"G0 X{line[0][0]} Y{line[0][1]}")
+        # Lower the pen
+        g_code_commands.append(f"G1 Z{0}")
+        for p in line[1:]:
+            # Move to next point
+            g_code_commands.append(f"G1 X{p[0]} Y{p[1]}")
+        # Lift the pen
+        g_code_commands.append(f"G1 Z{st.session_state.head_lift}")
     svg_string += "</svg>"
     st.image(svg_string, use_column_width=True)
+    st.download_button("Download G-code", "\n".join(g_code_commands), "plotter.gcode")
 
 def main():
     st.set_page_config(page_title="Plotter", page_icon=":pencil:", layout="wide")
@@ -38,7 +60,7 @@ def main():
         y_offset = st.number_input("Y offset", value=25, key="y_offset")
         img_size = st.number_input("Image size", value=200, key="img_size")
         head_lift = st.number_input("Head lift", value=1, key="head_lift")
-        stroke_width = st.number_input("Stroke width", value=0.1, key="stroke_width")
+        stroke_width = st.number_input("Stroke width", value=0.2, key="stroke_width")
         hatch = st.checkbox("Hatch")
         linedraw.draw_hatch = hatch
         contour_simplification = st.number_input("Contour simplification", step=1, value=2)
