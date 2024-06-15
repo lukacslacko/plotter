@@ -29,7 +29,7 @@ def draw_lines(lines):
     g_code_commands.append(f"G1 Z{st.session_state.head_lift}")
     svg_string = f"""<svg width="{bed_x_size}" height="{bed_y_size}" xmlns="http://www.w3.org/2000/svg">"""
     # Draw box from (0,0) to (bed_x_size, bed_y_size)
-    svg_string += f"""<polyline points="0,0 0,{bed_y_size} {bed_x_size},{bed_y_size} {bed_x_size},0 0,0" fill="none" stroke="black" stroke-width="1"/>"""
+    svg_string += f"""<polyline points="0,0 0,{bed_y_size} {bed_x_size},{bed_y_size} {bed_x_size},0 0,0" fill="white" stroke="black" stroke-width="1"/>"""
     for line in scaled_lines:
         svg_string += f"""<polyline points='{" ".join([f"{p[0]},{p[1]}" for p in line])}' fill="none" stroke="black" stroke-width="{st.session_state.stroke_width}"/>"""
         # Move to starting position
