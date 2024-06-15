@@ -43,7 +43,7 @@ def draw_lines(lines):
         g_code_commands.append(f"G1 Z{st.session_state.head_lift}")
     svg_string += "</svg>"
     st.image(svg_string, use_column_width=True)
-    st.download_button("Download G-code", "\n".join(g_code_commands), "plotter.gcode")
+    st.download_button("Download G-code", "\n".join(g_code_commands), "plotter.gcode", type="primary")
 
 def main():
     st.set_page_config(page_title="Plotter", page_icon=":pencil:", layout="wide")
